@@ -3,8 +3,7 @@
         <div class="row">
             <div class="input-group">
                 <span class="icon-add-task">+</span>
-                <input type="text" class="form-control" placeholder="添加任务" v-model="inputValue">
-                <button type="button" class="add-btn btn btn-default" @click="addTask">添加</button>
+                <input type="text" class="form-control" placeholder="添加任务" v-model="inputValue" @keyup.enter="addTask">
             </div>
         </div>
     </div>
@@ -14,7 +13,8 @@ import { defineComponent, reactive, ref } from 'vue'
 
 export interface TodoType {
     done: boolean,
-    title: string
+    title: string,
+    id: number
 }
 
 export default defineComponent({
@@ -22,20 +22,22 @@ export default defineComponent({
     emits: ['addTask'],
     setup(props,context) {
         const inputValue = ref('')
-        // const todoList = reactive<TodoType[]>([])
+        // 标识创建的task的索引值
+        let todoIndex = 0  
         const addTask = () => {
             const todoObj = reactive<TodoType>({
                 done: false,
-                title: ''
+                title: '',
+                id: todoIndex
             })
             todoObj.done = false
             todoObj.title = inputValue.value
             context.emit('addTask',todoObj)
             inputValue.value = ''
+            todoIndex++
         }
         return {
             inputValue,
-            // todoList,
             addTask
         }
     },

@@ -1,13 +1,13 @@
 <template>
     <div class="showTask">
-		<div class="showTask_container" v-for="(item,index) in doingTask" :key="index">
+		<div class="showTask_container" v-for="(item,index) in doingTask" :key="item.id">
 			<div class="row">
 				<div class="input-group">
 					<span class="input-group-addon">
 						<input type="checkbox" class="show-checkbox" :checked="item.done" @change="isDone(index)">
 					</span>
-					<input type="text" class="form-control" :value="item.title">
-					<button type="button" class="remove-btn btn btn-default">删除</button>
+					<input type="text" class="form-control" :value="item.title" @keyup.enter="isModify(item.id,index,'doingTask',$event)">
+					<button type="button" class="remove-btn btn btn-default" @click="isDelete(index,'doingTask')">删除</button>
 				</div>
         	</div>
 		</div>
@@ -29,11 +29,20 @@ export default defineComponent({
 		console.log(props.doingTask,'doingTask');
 		const isDone = (index: number) => {
 			console.log(index,'index');
-			
 			context.emit('isDone',index)
 		}
+		const isDelete = (index:number,info:string) => {
+			console.log(index,'index');
+			context.emit('isDelete',index,info)
+		}
+		const isModify = (id:number,index:number,info:string,e:Event) => {
+			const value = (e.target as HTMLInputElement).value
+			context.emit('isModify',id,index,info,value)
+		}
 		return {
-			isDone
+			isDone,
+			isDelete,
+			isModify
 		}
     },
 })
