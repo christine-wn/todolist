@@ -4,7 +4,7 @@
 			<div class="row">
 				<div class="input-group">
 					<span class="input-group-addon">
-						<input type="checkbox" class="show-checkbox" :checked="item.done" @change="isDoing(index)">
+						<input type="checkbox" class="show-checkbox" :checked="item.done" @change="isDoing(index,item.done)">
 					</span>
 					<input type="text" class="form-control" :value="item.title" @keyup.enter="isModify(item.id,index,'doingTask',$event)">
 					<button type="button" class="remove-btn btn btn-default" @click="isDelete(index,'DoneTask')">删除</button>
@@ -14,7 +14,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import { TodoType } from './addTask.vue'
 
 export default defineComponent({
@@ -27,8 +27,8 @@ export default defineComponent({
 	},
     setup(props,context) {
         console.log(props.doneTask,'doneTask');
-        const isDoing = (index:number) => {
-            context.emit('isDoing', index)
+        const isDoing = (index:number,done: boolean) => {
+            context.emit('isDoing', index, !done)
         }
         const isDelete = (index:number,info:string) => {
 			console.log(index,'index');

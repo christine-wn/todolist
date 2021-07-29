@@ -1,5 +1,6 @@
 <template>
     <div id="app">
+        <search-task @searchTask="searchTask"></search-task>
         <add-task @addTask="addTask"></add-task>
         <p v-if="doingTask.length">正在进行</p>
         <doing-task 
@@ -20,8 +21,9 @@
  
 <script lang="ts">
 import AddTask, { TodoType } from './components/addTask.vue'
-import doingTask from './components/doingTask.vue'
-import doneTask from './components/doneTask.vue'
+import DoingTask from './components/doingTask.vue'
+import DoneTask from './components/doneTask.vue'
+import SearchTask from './components/searchTask.vue'
 
 import { defineComponent, reactive } from 'vue'
 
@@ -29,41 +31,74 @@ export default defineComponent({
     name: 'app',
     components: {
         AddTask,
-        doingTask,
-        doneTask
+        DoingTask,
+        DoneTask,
+        SearchTask
     },
     setup() {
         const doingTask = reactive<TodoType[]>([])
         const doneTask = reactive<TodoType[]>([])
+        const totalTask = reactive<TodoType[]>([])
         const addTask = (todoObj:TodoType) => {
             doingTask.unshift(todoObj)
         }
-        const isDone = (index:number) => {
-            doingTask[index].done = true
-            doneTask.unshift(doingTask[index])
-            doingTask.splice(index, 1)
+        const isDone = (index:number,isdone: boolean) => {
+            dealTask(index,isdone,doingTask,doneTask,'unshift')
+        }
+        const isDoing = (index:number,isdone: boolean) => {
+            dealTask(index,isdone,doneTask,doingTask, 'push')
+        }
+        const dealTask = (index:number,isdone: boolean,fromtTask: TodoType[],toTask: TodoType[],oprator: string) => {
+            fromtTask[index].done = isdone
+            switch(oprator) {
+                case 'push': 
+                    toTask.push(fromtTask[index])
+                    break;
+                case 'unshift':
+                    toTask.unshift(fromtTask[index])
+            }
+            fromtTask.splice(index, 1)
         }
         const isDelete = (index:number,info:string) => {
-            if(info === 'doingTask') {
-                doingTask.splice(index,1)
-            } else {
-                doneTask.splice(index,1)
+            switch(info) {
+                case 'doingTask':
+                    doingTask.splice(index,1)
+                    break
+                case 'doneTask':
+                    doneTask.splice(index,1)
+                    break
+                default:
+                    break
             }
         }
         const isModify = (todoIndex:number,index:number,info:string,value:string) => {
-            console.log(doingTask,'doingTaskyyyyyyyyyy');
-            if(info === 'doingTask') {
-                doingTask.splice(index,1,{
-                    done: false,
-                    title: value,
-                    id: todoIndex
-                })
+            switch(info) {
+                case 'doingTask':
+                    doingTask.splice(index,1,{
+                        done: false,
+                        title: value,
+                        id: todoIndex
+                    })  
+                    break;
+                case 'doneTask':
+                    doneTask.splice(index,1,{
+                        done: true,
+                        title: value,
+                        id: todoIndex
+                    })  
+                    break;
+                default:
+                    break;
             }
         }
-        const isDoing = (index:number) => {
-            doneTask[index].done = false
-            doingTask.push(doneTask[index])
-            doneTask.splice(index, 1)
+        const searchTask = (targetValue:string) => {
+            console.log(targetValue,'targetValue');
+            doingTask.forEach(item => {
+                if(item.title.indexOf(targetValue) !== -1) {
+                    console.log(item,'itemxxxxxxx');
+                }
+            })
+            console.log(totalTask,'totalTask');
         }
         return {
             doingTask,
@@ -71,8 +106,10 @@ export default defineComponent({
             addTask,
             isDone,
             isDoing,
+            dealTask,
             isDelete,
-            isModify
+            isModify,
+            searchTask
         }
     },
 })
