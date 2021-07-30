@@ -1,6 +1,6 @@
 <template>
     <div class="searchTask">
-        <input type="text" class="form-control" placeholder="搜索任务" :value="searchValue" @keyup.enter="searchTask($event)">
+        <input type="text" class="form-control" placeholder="搜索任务" :value="searchValue" @keyup="searchTask($event)">
     </div>
 </template>
 <script lang="ts">
